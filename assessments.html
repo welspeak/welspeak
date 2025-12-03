@@ -1,0 +1,42 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Assessments</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="navbar">Assessments <span style="float:right"><button class="btn" onclick="logout()">Logout</button></span></div>
+<div class="container">
+  <div class="header-row"><h2>Available Assessments</h2><div class="small">User: <span id="uName"></span></div></div>
+  <table>
+    <thead><tr><th>Assessment Title</th><th>Deadline</th><th>Action</th></tr></thead>
+    <tbody id="assessmentList"></tbody>
+  </table>
+  <p class="note">Click "Take" to open the assessment. Teachers can delete assessments from this page.</p>
+</div>
+<script src="api.js"></script>
+<script>
+if (!requireLogin()) throw '';
+document.getElementById('uName').innerText = localStorage.getItem('name') || localStorage.getItem('username');
+
+async function loadAssessments() {
+  const list = await apiGet('/api/assessments');
+  const tbody = document.getElementById('assessmentList');
+  tbody.innerHTML = '';
+  list.forEach(a => {
+    const dead = a.deadline ? new Date(a.deadline).toLocaleString() : 'No deadline';
+    const takeBtn = `<button class="btn" onclick="startAssessment(${a.id})">Take</button>`;
+    const delBtn = `<button class="btn" style="background:#8b1d1d" onclick="deleteAssessment(${a.id})">Delete</button>`;
+    tbody.innerHTML += `<tr><td>${a.title}</td><td>${dead}</td><td>${takeBtn} ${localStorage.getItem('role') && localStorage.getItem('role').toUpperCase().includes('TEACHER') ? delBtn : ''}</td></tr>`;
+  });
+}
+
+function startAssessment(id) {
+  localStorage.setItem('assessmentId', id);
+  window.location = 'take-assessment.html';
+}
+
+async function deleteAssessment(id) {
+  if (!confirm('Delete assessment?')) return;
+  const res = await fetch(API_URL + '/api/assessments/' + id, { method:'DELETE', headers: authHeader() });
+  if (res.ok) { alert('Deleted'); loadAssessments(); } else alert('Failed to delete');
+}
+
+loadAssessments();
+</script>
+</body></html>

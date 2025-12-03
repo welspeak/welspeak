@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Login - AMS</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="container">
+  <h2>Assessment Management System</h2>
+  <p class="note">Log in with sample accounts: <strong>student1 / studpass</strong> or <strong>teacher1 / teachpass</strong></p>
+  <label>Username</label>
+  <input id="user" type="text" placeholder="Enter username">
+  <label>Password</label>
+  <input id="pass" type="password" placeholder="Enter password">
+  <div style="margin-top:10px" class="flex">
+    <button class="btn" onclick="doLogin()">Login</button>
+    <button class="btn" onclick="window.location='index.html'">Reset</button>
+  </div>
+  <p class="note">Please Log in for Examinations.</p>
+  <div id="message" class="message" style="display:none"></div>
+</div>
+<script src="api.js"></script>
+<script>
+async function doLogin() {
+  const username = document.getElementById('user').value.trim();
+  const password = document.getElementById('pass').value.trim();
+  if (!username || !password) { alert('Enter credentials'); return; }
+  try {
+    const res = await fetch(API_URL + '/api/auth/login', {
+      method: 'POST', 
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (data.error) {
+      showMessage(data.error, 'error');
+      return;
+    }
+    saveLogin(data.token, data.role, username, data.name, data.id || null);
+    showMessage('Login successful', 'success');
+
+    if (!localStorage.getItem('userId')) {
+      const mapped = USERNAME_ID_MAP[username];
+      if (mapped) localStorage.setItem('userId', mapped);
+    }
+    setTimeout(()=>{
+      if (data.role && data.role.toUpperCase().includes('TEACHER')) window.location='teacher-dashboard.html';
+      else window.location='student-dashboard.html';
+    }, 700);
+  } catch(e) { showMessage('Login failed: ' + e.message, 'error'); }
+}
+
+function showMessage(msg, type) {
+  const el = document.getElementById('message');
+  el.style.display = 'block';
+  el.innerText = msg;
+  el.className = 'message ' + (type === 'success' ? 'success' : 'error');
+}
+</script>
+</body>
+</html>

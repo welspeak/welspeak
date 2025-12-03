@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Student Dashboard</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="navbar">Student Dashboard <span style="float:right"><button class="btn" onclick="logout()">Logout</button></span></div>
+<div class="container">
+  <div class="header-row"><h2 id="welcomeText">Welcome</h2><div class="small">User: <span id="userName"></span></div></div>
+  <p class="note">Quick links:</p>
+  <div style="display:flex;gap:12px;margin-top:12px">
+    <a class="link" href="assessments.html">View Available Assessments</a>
+    <a class="link" href="results.html">View My Results</a>
+  </div>
+</div>
+<script src="api.js"></script>
+<script>
+if (!requireLogin()) throw '';
+document.getElementById('userName').innerText = localStorage.getItem('name') || localStorage.getItem('username');
+document.getElementById('welcomeText').innerText = 'Welcome, ' + (localStorage.getItem('name') || localStorage.getItem('username'));
+</script>
+</body></html>

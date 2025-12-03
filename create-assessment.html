@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Create Assessment</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="navbar">Create Assessment <span style="float:right"><button class="btn" onclick="logout()">Logout</button></span></div>
+<div class="container">
+  <h2>Create New Assessment</h2>
+  <label>Assessment Title</label><input id="title" type="text">
+  <label>Deadline</label><input id="deadline" type="date">
+  <label>Question (short answer)</label><input id="q1" type="text">
+  <label>Question (short answer)</label><input id="q2" type="text">
+  <div style="margin-top:10px"><button class="btn" onclick="saveAssessment()">Save Assessment</button> <a class="link" href="teacher-dashboard.html">Back</a></div>
+  <div id="msg" class="message" style="display:none"></div>
+</div>
+<script src="api.js"></script>
+<script>
+if (!requireLogin()) throw '';
+async function saveAssessment() {
+  const title = document.getElementById('title').value.trim();
+  const deadline = document.getElementById('deadline').value ? new Date(document.getElementById('deadline').value).toISOString() : null;
+  const q1 = document.getElementById('q1').value.trim();
+  const q2 = document.getElementById('q2').value.trim();
+  if (!title) { alert('Title required'); return; }
+  const payload = { title, deadline, questions: [] };
+  if (q1) payload.questions.push({ text: q1, type: 'SHORT', points: 1 });
+  if (q2) payload.questions.push({ text: q2, type: 'SHORT', points: 1 });
+  const res = await apiPost('/api/assessments', payload);
+  if (res.ok || res.id) { showMsg('Saved', 'success'); setTimeout(()=> window.location='teacher-dashboard.html', 700); }
+  else { showMsg('Save failed: ' + JSON.stringify(res), 'error'); }
+}
+function showMsg(txt, type) { const el=document.getElementById('msg'); el.style.display='block'; el.innerText=txt; el.className='message '+(type==='success'?'success':'error'); }
+</script>
+</body></html>

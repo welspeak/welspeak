@@ -1,0 +1,20 @@
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif}
+body{background:#f2f5f9}
+.navbar{background:#2b3a55;padding:15px;color:white;font-size:20px;font-weight:bold}
+.container{width:90%;max-width:900px;margin:20px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1)}
+.btn{padding:10px 20px;background:#2b3a55;color:white;border:none;border-radius:6px;cursor:pointer}
+.btn:hover{background:#1b263b}
+input,select,textarea{width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+table,th,td{border:1px solid #ccc}
+th,td{padding:10px;text-align:left}
+.link{color:#2b3a55;font-weight:bold;text-decoration:none}
+.link:hover{text-decoration:underline}
+.note{font-size:0.9rem;color:#374151;margin-top:8px}
+.header-row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.flex{display:flex;gap:10px;align-items:center}
+.small{font-size:0.9rem;color:#475569}
+.message{padding:10px;border-radius:6px;margin:10px 0}
+.success{background:#ecfdf5;color:#065f46}
+.error{background:#fff1f2;color:#9f1239}

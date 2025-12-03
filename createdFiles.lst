@@ -1,0 +1,13 @@
+com\assessment\sasing\repository\SubmissionRepository.class
+com\assessment\sasing\repository\QuestionRepository.class
+com\assessment\sasing\model\Question.class
+com\assessment\sasing\controller\AssessmentController.class
+com\assessment\sasing\repository\UserRepository.class
+com\assessment\sasing\controller\AuthController.class
+com\assessment\sasing\model\User.class
+com\assessment\sasing\model\Assessment.class
+com\assessment\sasing\repository\AssessmentRepository.class
+com\assessment\sasing\model\Submission.class
+com\assessment\sasing\SasingApplication.class
+com\assessment\sasing\model\Answer.class
+com\assessment\sasing\repository\AnswerRepository.class

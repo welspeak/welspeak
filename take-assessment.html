@@ -1,0 +1,71 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Take Assessment</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="navbar">Take Assessment <span style="float:right"><button class="btn" onclick="logout()">Logout</button></span></div>
+<div class="container">
+  <h2 id="title">Loading...</h2>
+  <div id="questions"></div>
+  <div style="margin-top:12px"><button class="btn" onclick="submitAssessment()">Submit</button> <a class="link" href="assessments.html">Back</a></div>
+  <div id="msg" class="message" style="display:none"></div>
+</div>
+<script src="api.js"></script>
+<script>
+if (!requireLogin()) throw '';
+const assessmentId = localStorage.getItem('assessmentId');
+if (!assessmentId) { alert('No assessment selected'); window.location='assessments.html'; }
+
+async function loadAssessment() {
+  const a = await apiGet('/api/assessments/' + assessmentId);
+  document.getElementById('title').innerText = a.title;
+  const qdiv = document.getElementById('questions');
+  qdiv.innerHTML = '';
+  a.questions.forEach((q, i) => {
+    if (q.type === 'MCQ') {
+      // parse choices (may be JSON)
+      let choices = [];
+      try { choices = JSON.parse(q.choices); } catch(e){ choices = []; }
+      qdiv.innerHTML += `<p>${i+1}. ${q.text}</p>`;
+      choices.forEach(c => {
+        qdiv.innerHTML += `<label><input type="radio" name="q_${q.id}" value="${c.id}"> ${c.text}</label><br>`;
+      });
+    } else {
+      qdiv.innerHTML += `<p>${i+1}. ${q.text}</p><textarea id="q_${q.id}" rows="3"></textarea>`;
+    }
+  });
+}
+
+async function submitAssessment() {
+  const inputs = document.querySelectorAll('[id^="q_"], input[type="radio"]:checked');
+  const answers = [];
+  // collect radio groups separately and textareas
+  const radios = {};
+  document.querySelectorAll('input[type="radio"]:checked').forEach(r => {
+    const name = r.name; const qid = name.split('_')[1];
+    radios[qid] = r.value;
+  });
+  document.querySelectorAll('textarea[id^="q_"]').forEach(t => {
+    const qid = t.id.split('_')[1];
+    answers.push({ questionId: qid, response: t.value });
+  });
+  for (const [qid, val] of Object.entries(radios)) answers.push({ questionId: qid, response: val });
+
+  const studentId = getUserId();
+  if (!studentId) { alert('Student id required'); return; }
+
+  const res = await apiPost('/api/submissions/' + assessmentId, { studentId: studentId, answers: answers });
+  if (res.ok) {
+    showMsg('Submitted successfully. Auto-score: ' + (res.autoScore || 0), 'success');
+    setTimeout(()=> window.location='results.html', 900);
+  } else {
+    showMsg('Submission failed: ' + JSON.stringify(res), 'error');
+  }
+}
+
+function showMsg(txt, type) {
+  const el = document.getElementById('msg');
+  el.style.display='block'; el.innerText = txt;
+  el.className = 'message ' + (type==='success' ? 'success':'error');
+}
+
+loadAssessment();
+</script>
+</body></html>
